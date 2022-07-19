@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   getAllContacts,
   deleteContact,
@@ -7,10 +9,8 @@ import {
   editContact,
 } from 'redux/contacts/contacts-operations';
 import { setFilter } from 'redux/filter/filter-actions';
-import {
-  getFilteredContacts,
-  getContactsLoadingAndError,
-} from 'redux/filtered-contacts-selector';
+import { getContactsLoading } from 'redux/contacts/contacts-selectors';
+import { getFilteredContacts } from 'redux/filter/filter-selectors';
 import ContactForm from './ContactForm';
 import Filter from './Filter';
 import ContactList from './ContactList';
@@ -25,13 +25,18 @@ export const App = () => {
 
   const { contact } = modal;
   const dispatch = useDispatch();
+  const toastId = useRef(null);
 
   useEffect(() => {
     dispatch(getAllContacts());
   }, [dispatch]);
 
   const filteredContacts = useSelector(getFilteredContacts);
-  const { loading, error } = useSelector(getContactsLoadingAndError);
+  const loading = useSelector(getContactsLoading);
+
+  function dismissCurrentToast() {
+    toast.dismiss(toastId.current);
+  }
 
   function addContactToGlobalStore(contact) {
     dispatch(addContact(contact));
@@ -42,6 +47,7 @@ export const App = () => {
   }
 
   function setGlobalFilter(letter) {
+    toast.dismiss(toastId.current);
     dispatch(setFilter(letter));
   }
 
@@ -63,10 +69,13 @@ export const App = () => {
   return (
     <div className="container">
       <h1>Phonebook</h1>
-      <ContactForm onSubmit={addContactToGlobalStore} />
+      <ContactForm
+        onSubmit={addContactToGlobalStore}
+        onFocus={dismissCurrentToast}
+      />
       <h2>Contacts</h2>
       <Filter onChange={setGlobalFilter} />
-      {error && <p>Error occured, try once again</p>}
+      {/* {error && <p>{error}</p>} */}
       {loading && <p>loading...</p>}
       <ContactList
         contacts={filteredContacts}
@@ -78,6 +87,7 @@ export const App = () => {
           <ContactEditor onSubmit={closeModalHandler} />
         </Modal>
       )}
+      <ToastContainer />
     </div>
   );
 };

@@ -1,7 +1,13 @@
 import { useState } from 'react';
 
-export default function useContactForm(initialState, submitFunction) {
+export default function useContactForm(
+  initialState,
+  submitFunction,
+  onFocusFunction
+) {
   const [formState, setFormState] = useState(initialState);
+
+  const focusHandler = () => onFocusFunction();
 
   const inputChangeHandler = ({ target }) => {
     const { name, value } = target;
@@ -16,5 +22,5 @@ export default function useContactForm(initialState, submitFunction) {
     reset();
   };
 
-  return [formState, inputChangeHandler, submitHandler];
+  return [formState, inputChangeHandler, submitHandler, focusHandler];
 }

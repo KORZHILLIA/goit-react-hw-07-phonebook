@@ -1,10 +1,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
 import {
   fetchAllContacts,
   deleteContactFromApi,
   addContactToApi,
   editContactInApi,
 } from 'shared/services/api/contacts-api';
+
+const toastSetup = {
+  position: toast.POSITION.TOP_CENTER,
+  autoClose: 2000,
+};
 
 export const getAllContacts = createAsyncThunk(
   'contacts/getAllContacts',
@@ -13,7 +19,12 @@ export const getAllContacts = createAsyncThunk(
       const allContacts = await fetchAllContacts();
       return allContacts;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        toast.error('Server error, try again', {
+          ...toastSetup,
+          autoClose: false,
+        })
+      );
     }
   }
 );
@@ -29,13 +40,20 @@ export const addContact = createAsyncThunk(
         item => item.name === contact.name && item.phone === contact.phone
       );
       if (isAddingContactPresents) {
-        alert(`${contact.name} is already present`);
+        toast.error(`${contact.name} is already present`, toastSetup);
         return;
       }
       const addedContact = await addContactToApi(contact);
+      toast.success(`Contact ${addedContact.name} is added`, {
+        ...toastSetup,
+        delay: 1000,
+      });
+
       return addedContact;
     } catch (error) {
-      return rejectWithValue('Something wrong with contact adding');
+      return rejectWithValue(
+        toast.error('Something wrong with contact adding', toastSetup)
+      );
     }
   }
 );
@@ -45,13 +63,19 @@ export const deleteContact = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const deletedContact = await deleteContactFromApi(id);
-      setTimeout(
-        () => alert(`Contact ${deletedContact.name}'s been deleted`),
-        1000
-      );
+
+      toast.success(`Contact ${deletedContact.name}'s been deleted`, {
+        ...toastSetup,
+        delay: 0,
+      });
       return deletedContact.id;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        toast.error(
+          'Server is unable to delete this contact, try again later',
+          toastSetup
+        )
+      );
     }
   }
 );
@@ -67,13 +91,21 @@ export const editContact = createAsyncThunk(
         item => item.name === contact.name && item.phone === contact.phone
       );
       if (isUpdatedContactPresent) {
-        alert('Contact with these name and phone is already present');
+        toast.warn(
+          'Contact with these name and phone is already present',
+          toastSetup
+        );
         return;
       }
       const updatedContacts = await editContactInApi(contact);
       return updatedContacts;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        toast.error(
+          "It's impossible to update this contact at a time, try once again",
+          toastSetup
+        )
+      );
     }
   }
 );

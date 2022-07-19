@@ -1,7 +1,3 @@
-export const getContactsLoadingAndError = ({
-  contacts: { loading, error },
-}) => ({ loading, error });
-
 export const getFilteredContacts = ({ contacts: { items, filter } }) => {
   if (!filter) {
     return items;

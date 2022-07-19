@@ -3,14 +3,16 @@ import PropTypes from 'prop-types';
 import useContactForm from 'shared/services/hooks/useContactForm';
 import styles from './ContactForm.module.css';
 
-const ContactForm = ({ onSubmit }) => {
-  const [state, inputChangeHandler, submitHandler] = useContactForm(
-    {
-      name: '',
-      phone: '',
-    },
-    onSubmit
-  );
+const ContactForm = ({ onSubmit, onFocus }) => {
+  const [state, inputChangeHandler, submitHandler, focusHandler] =
+    useContactForm(
+      {
+        name: '',
+        phone: '',
+      },
+      onSubmit,
+      onFocus
+    );
 
   const { name, phone } = state;
 
@@ -20,6 +22,7 @@ const ContactForm = ({ onSubmit }) => {
         <input
           className={styles.input}
           onChange={inputChangeHandler}
+          onFocus={focusHandler}
           type="text"
           name="name"
           value={name}
@@ -33,6 +36,7 @@ const ContactForm = ({ onSubmit }) => {
         <input
           className={styles.input}
           onChange={inputChangeHandler}
+          onFocus={focusHandler}
           type="tel"
           name="phone"
           value={phone}

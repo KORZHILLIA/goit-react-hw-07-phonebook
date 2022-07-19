@@ -29,12 +29,14 @@ const ContactEl = ({
 
 ContactEl.defaultProps = {
   deleteClickHandler: () => {},
+  openModalHandler: () => {},
 };
 
 ContactEl.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   phone: PropTypes.string.isRequired,
-  deleteClickHandler: PropTypes.func.isRequired,
+  deleteClickHandler: PropTypes.func,
+  openModalHandler: PropTypes.func,
 };
 export default ContactEl;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PropTypes } from 'prop-types';
 import styles from './contactEditor.module.css';
 
 const formInitialState = {
@@ -83,6 +84,14 @@ const ContactEditor = ({ onSubmit }) => {
       </button>
     </form>
   );
+};
+
+ContactEditor.defaultProps = {
+  onSubmit: () => {},
+};
+
+ContactEditor.propTypes = {
+  onSubmit: PropTypes.func,
 };
 
 export default ContactEditor;
