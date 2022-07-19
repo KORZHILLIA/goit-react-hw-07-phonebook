@@ -1,0 +1,11 @@
+.contactEl:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.contactText:not(:first-child) {
+  margin-right: 20px;
+}
+
+.deleteBtn {
+  margin-right: 10px;
+}
