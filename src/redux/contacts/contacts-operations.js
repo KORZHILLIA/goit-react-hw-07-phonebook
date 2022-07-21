@@ -13,7 +13,7 @@ const toastSetup = {
 };
 
 export const getAllContacts = createAsyncThunk(
-  'contacts/getAllContacts',
+  'contacts/getAll',
   async (_, { rejectWithValue }) => {
     try {
       const allContacts = await fetchAllContacts();
@@ -30,36 +30,65 @@ export const getAllContacts = createAsyncThunk(
 );
 
 export const addContact = createAsyncThunk(
-  'contacts/addContact',
-  async (contact, { getState, rejectWithValue }) => {
+  'contacts/add',
+  async (contact, { rejectWithValue }) => {
     try {
-      const {
-        contacts: { items },
-      } = getState();
-      const isAddingContactPresents = items.find(
-        item => item.name === contact.name && item.phone === contact.phone
-      );
-      if (isAddingContactPresents) {
-        toast.error(`${contact.name} is already present`, toastSetup);
-        return;
-      }
       const addedContact = await addContactToApi(contact);
-      toast.success(`Contact ${addedContact.name} is added`, {
-        ...toastSetup,
-        delay: 1000,
-      });
-
       return addedContact;
     } catch (error) {
       return rejectWithValue(
         toast.error('Something wrong with contact adding', toastSetup)
       );
     }
+  },
+  {
+    condition: (contact, { getState }) => {
+      const {
+        contacts: { items },
+      } = getState();
+      const { name, phone } = contact;
+      const isContactPresent = items.find(
+        item => item.name === name && item.phone === phone
+      );
+      if (isContactPresent) {
+        toast.error(`${contact.name} is already present`, toastSetup);
+        return false;
+      }
+    },
   }
 );
 
+// export const addContact = createAsyncThunk(
+//   'contacts/addContact',
+//   async (contact, { getState, rejectWithValue }) => {
+//     try {
+//       const {
+//         contacts: { items },
+//       } = getState();
+//       const isAddingContactPresents = items.find(
+//         item => item.name === contact.name && item.phone === contact.phone
+//       );
+//       if (isAddingContactPresents) {
+//         toast.error(`${contact.name} is already present`, toastSetup);
+//         return;
+//       }
+//       const addedContact = await addContactToApi(contact);
+//       toast.success(`Contact ${addedContact.name} is added`, {
+//         ...toastSetup,
+//         delay: 1000,
+//       });
+
+//       return addedContact;
+//     } catch (error) {
+//       return rejectWithValue(
+//         toast.error('Something wrong with contact adding', toastSetup)
+//       );
+//     }
+//   }
+// );
+
 export const deleteContact = createAsyncThunk(
-  'contacts/deleteContact',
+  'contacts/delete',
   async (id, { rejectWithValue }) => {
     try {
       const deletedContact = await deleteContactFromApi(id);
@@ -81,34 +110,69 @@ export const deleteContact = createAsyncThunk(
 );
 
 export const editContact = createAsyncThunk(
-  'contacts/editContact',
-  async (contact, { getState, rejectWithValue }) => {
+  'contacts/edit',
+  async (contact, { rejectWithValue }) => {
     try {
-      const {
-        contacts: { items },
-      } = getState();
-      const isUpdatedContactPresent = items.find(
-        item => item.name === contact.name && item.phone === contact.phone
-      );
-      if (isUpdatedContactPresent) {
-        toast.warn(
-          'Contact with these name and phone is already present',
-          toastSetup
-        );
-        return;
-      }
       const updatedContacts = await editContactInApi(contact);
       return updatedContacts;
     } catch (error) {
-      return rejectWithValue(
+      rejectWithValue(
         toast.error(
           "It's impossible to update this contact at a time, try once again",
           toastSetup
         )
       );
     }
+  },
+  {
+    condition: (contact, { getState }) => {
+      const {
+        contacts: { items },
+      } = getState();
+      const { name, phone } = contact;
+      const isUpdatedContactPresent = items.find(
+        item => item.name === name && item.phone === phone
+      );
+      if (isUpdatedContactPresent) {
+        toast.warn(
+          'Contact with these name and phone is already present',
+          toastSetup
+        );
+        return false;
+      }
+    },
   }
 );
+
+// export const editContact = createAsyncThunk(
+//   'contacts/editContact',
+//   async (contact, { getState, rejectWithValue }) => {
+//     try {
+//       const {
+//         contacts: { items },
+//       } = getState();
+//       const isUpdatedContactPresent = items.find(
+//         item => item.name === contact.name && item.phone === contact.phone
+//       );
+//       if (isUpdatedContactPresent) {
+//         toast.warn(
+//           'Contact with these name and phone is already present',
+//           toastSetup
+//         );
+//         return;
+//       }
+//       const updatedContacts = await editContactInApi(contact);
+//       return updatedContacts;
+//     } catch (error) {
+//       return rejectWithValue(
+//         toast.error(
+//           "It's impossible to update this contact at a time, try once again",
+//           toastSetup
+//         )
+//       );
+//     }
+//   }
+// );
 
 // export const getAllContacts = () => async dispatch => {
 //   dispatch(allConactsActions.getContactsRequest());
